@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriSmart AI Assistant</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('https://images.pexels.com/photos/16763618/pexels-photo-16763618/free-photo-of-agriculture-field.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+      background-size: cover;
+      background-position: center;
+      color: #222;
+    }
+    header {
+      background: rgba(0, 90, 0, 0.85);
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.9);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    #chatBox {
+      height: 350px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      background: #fafafa;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .bot {
+      color: #006400;
+      margin: 6px 0;
+    }
+    .user {
+      text-align: right;
+      color: #003366;
+      margin: 6px 0;
+    }
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      font-size: 14px;
+    }
+    button {
+      padding: 10px 14px;
+      background: #006400;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #004d00;
+    }
+    select {
+      padding: 6px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>AgriSmart AI Assistant</header>
+
+<div class="container">
+
+  <select id="language">
+    <option value="en">English</option>
+    <option value="ur">Urdu</option>
+    <option value="pa">Punjabi</option>
+    <option value="ps">Pashto</option>
+    <option value="gl">Gilgiti</option>
+  </select>
+
+  <div id="chatBox"></div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Ask about agriculture or smart farming...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<script>
+  const chatBox = document.getElementById('chatBox');
+
+  function addMessage(text, cls) {
+    const div = document.createElement('div');
+    div.className = cls;
+    div.innerText = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('userInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    addMessage(text, 'user');
+    input.value = '';
+
+    const lang = document.getElementById('language').value;
+
+    addMessage('Thinking...', 'bot');
+
+    try {
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        body: JSON.stringify({ text, language: lang }),
+      });
+      const data = await response.json();
+      chatBox.lastChild.innerText = data.reply;
+    } catch (e) {
+      chatBox.lastChild.innerText = "Sorry, something went wrong.";
+      console.error(e);
+    }
+  }
+</script>
+
+</body>
+</html>
